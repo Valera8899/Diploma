@@ -1,0 +1,29 @@
+﻿@model List<Monitor_2.Models.Shopping.Lot>
+
+@{
+    ViewData["Title"] = "Збережені лоти";
+}
+
+<div class="semi-transparent-background">
+    <h2>@ViewData["Title"]</h2>
+
+    @if (!Model.Any())
+    {
+        <p>Ви ще не зберегли жодного лоту.</p>
+    }
+    else
+    {
+        <div class="lot-container">
+            @foreach (var lot in Model)
+            {
+                <div class="lot-item">
+                    <a href="@lot.Url">@lot.Name</a> - @lot.Price грн
+                    <br />
+                    <img src="@lot.PhotoUrl" alt="@lot.Name" />
+                    <br />
+                    Маркетплейс: <a href="@lot.Marketplace.SiteUrl" target="_blank">@lot.Marketplace.Name</a>
+                </div>
+            }
+        </div>
+    }
+</div>

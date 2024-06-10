@@ -1,0 +1,146 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  background-image: url('/images/Background_1.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+}
+
+.text-background {
+  background-color: rgba(255, 255, 255, 0.01); /* білий з 80% прозорістю */
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 20px auto; /* центрує блок на сторінці */
+}
+
+.text-background p {
+  margin: 0;
+}
+
+.semi-transparent-background {
+    background-color: rgba(255, 255, 255, 0.94); /* Напівпрозорий білий фон */
+    padding: 20px; /* Відступи всередині блоку */
+    border-radius: 8px; /* Кути блоку злегка закруглені */
+    margin-bottom: 20px; /* Відступ знизу для відділення блоків один від одного */
+}
+
+.footer {
+    background-color: rgb(83, 98, 113); /* Синій колір фону */
+    color: white; /* Білий колір тексту */
+    padding: 20px 0; /* Відступи зверху і знизу внутрішнього вмісту футера */
+    position: fixed; /* Фіксована позиція */
+    bottom: 0; /* Прив'язка до нижнього краю екрана */
+    width: 100%; /* Ширина футера на весь екран */
+}
+
+.footer a {
+    color: white; /* Білий колір тексту для посилань */
+}
+
+.footer a:hover {
+    color: #eaeaea; /* Зміна кольору тексту посилань при наведенні курсора */
+}
+
+.graph-container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.graph-container canvas {
+    width: 100%;
+    height: 400px;
+}
+
+
+/* Стиль для контейнера лотів */
+.lot-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Центрує всі лоти по горизонталі */
+    gap: 20px; /* Відстань між лотами */
+}
+
+/* Стиль для кожного лота */
+.lot-item {
+    background-color: white; /* Білий непрозорий фон */
+    border: 2px solid black; /* Чорна обводка середньої товщини */
+    padding: 20px; /* Відступи всередині блоку */
+    border-radius: 8px; /* Кути блоку злегка закруглені */
+    width: 250px; /* Ширина блоку */
+    text-align: center; /* Центрування тексту */
+}
+
+.lot-item img {
+    max-width: 100%; /* Обмеження ширини зображення */
+    height: auto; /* Збереження пропорцій */
+}
+
+.lot-item a {
+    text-decoration: none; /* Прибрати підкреслення у посилань */
+    color: black; /* Чорний колір тексту */
+    font-weight: bold; /* Жирний шрифт */
+}
+
+.lot-item a:hover {
+    color: #258cfb; /* Зміна кольору тексту при наведенні курсора */
+}
+
+
+.search-form {
+    margin: 20px auto; /* Відступи зверху і знизу форми */
+    max-width: 600px; /* Обмежуємо ширину форми */
+    text-align: center; /* Центруємо форму */
+}
+
+.search-form .form-control {
+    display: inline-block;
+    width: calc(100% - 100px);
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.search-form .btn {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#search-history-dropdown {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000;
+    width: calc(100% - 20px); /* Обмежуємо ширину випадаючого списку */
+}
+
+#search-history-dropdown .dropdown-item {
+    padding: 10px;
+}
+

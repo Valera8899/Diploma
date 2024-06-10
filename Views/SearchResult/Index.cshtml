@@ -1,0 +1,91 @@
+﻿@model List<Monitor_2.Models.Shopping.Lot>
+
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+@using System.Linq
+
+<div class="semi-transparent-background">
+    <h2>Результати пошуку за '@ViewBag.SearchQuery'</h2>
+
+    <div>
+        <h5>Введіть ключові слова або фрази для пошуку дослівних співпадінь в описі товару</h5>
+        <form asp-action="AddKeywords" method="post">
+            <input type="hidden" name="searchId" value="@ViewBag.SearchId" />
+            <textarea id="keywords" name="keywords" rows="3" style="width:100%;"></textarea>
+            <br />
+            <button type="submit" class="btn btn-primary">Шукати</button>
+        </form>
+    </div>
+
+    @if (ViewBag.Keywords != null && ViewBag.Keywords.Count > 0)
+    {
+        <div style="margin-top: 10px;">
+            <h6 style="color: limegreen;">Результати за ключовими словами</h6>
+            <ul style="list-style-type: none; padding: 0; margin-top: 5px;">
+                @foreach (var keyword in ViewBag.Keywords)
+                {
+                    <li>@keyword</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="lot-container" style="margin-top: 10px;">
+        @foreach (var lot in Model)
+        {
+            <div class="lot-item">
+                <a href="@lot.Url">@lot.Name</a> - @lot.Price грн
+                <br />
+                <img src="@lot.PhotoUrl" alt="@lot.Name" />
+                <br />
+                Маркетплейс: <a href="@lot.Marketplace.SiteUrl" target="_blank">@lot.Marketplace.Name</a>
+                <br />
+                @if (lot.FoundKeywords != null && lot.FoundKeywords.Any())
+                {
+                    <div class="found-keywords" style="text-align: left; margin-top: 15px;">
+                        <h5>Знайдено:</h5>
+                        <ul style="list-style-type: none; padding: 0; margin-top: 5px;">
+                            @foreach (var keyword in lot.FoundKeywords)
+                            {
+                                <li>@keyword</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <button class="btn btn-success save-lot" data-lot-url="@lot.Url" style="margin-top: 10px;">Зберегти лот</button>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.save-lot').click(function () {
+                var lotUrl = $(this).data('lot-url');
+                console.log("Lot URL: " + lotUrl); // Видалення логування
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("SaveLot", "SearchResult")',
+                    data: {
+                        lotUrl: lotUrl,
+                        RequestVerificationToken: $('input[name="RequestVerificationToken"]').val()
+                    },
+                    success: function (data) {
+                        alert(data.message);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Status: " + status + ", Error: " + error);
+                        alert('Помилка збереження лоту');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+@Html.AntiForgeryToken()

@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chart Example</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="semi-transparent-background">
+        <div class="controls">
+            <h3>Додати лінію</h3>
+            <select id="companySelect">
+                <option value="Garant">Garant</option>
+                <option value="IFS">IFS</option>
+                <option value="Change">Change</option>
+            </select>
+            <select id="pairSelect">
+                <option value="USD-UAH">USD-UAH</option>
+                <option value="EUR-UAH">EUR-UAH</option>
+                <option value="GBP-UAH">GBP-UAH</option>
+                <option value="CHF-UAH">CHF-UAH</option>
+            </select>
+            <select id="rateSelect">
+                <option value="Buy">Buy</option>
+                <option value="Sell">Sell</option>
+            </select>
+            <button id="addLineButton">Додати</button>
+        </div>
+
+        <div class="legend-container">
+            <!-- Тут будуть додаватися чекбокси для контролю видимості ліній -->
+        </div>
+
+        <div class="correlation">
+            <h3>Кореляція</h3>
+            <select id="companySelect1">
+                <option value="Garant">Garant</option>
+                <option value="IFS">IFS</option>
+                <option value="Change">Change</option>
+            </select>
+            <select id="pairSelect1">
+                <option value="USD-UAH">USD-UAH</option>
+                <option value="EUR-UAH">EUR-UAH</option>
+                <option value="GBP-UAH">GBP-UAH</option>
+                <option value="CHF-UAH">CHF-UAH</option>
+            </select>
+            <select id="rateSelect1">
+                <option value="Buy">Buy</option>
+                <option value="Sell">Sell</option>
+            </select>
+            <span>та</span>
+            <select id="companySelect2">
+                <option value="Garant">Garant</option>
+                <option value="IFS">IFS</option>
+                <option value="Change">Change</option>
+            </select>
+            <select id="pairSelect2">
+                <option value="USD-UAH">USD-UAH</option>
+                <option value="EUR-UAH">EUR-UAH</option>
+                <option value="GBP-UAH">GBP-UAH</option>
+                <option value="CHF-UAH">CHF-UAH</option>
+            </select>
+            <select id="rateSelect2">
+                <option value="Buy">Buy</option>
+                <option value="Sell">Sell</option>
+            </select>
+            <button id="calculateCorrelationButton">Обчислити</button>
+            <div id="correlationResult"></div>
+        </div>
+
+        <div class="graph-container">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chartData = {
+            labels: [], // Потрібно буде оновити, коли буде завантажено дані
+            datasets: []
+        };
+
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function (value, index, values) {
+                                return value.toFixed(2); // Форматуємо значення на осі Y до двох знаків після коми
+                            }
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Функція для додавання нової лінії
+        function addLine(company, pair, rate) {
+            $.ajax({
+                url: '/LineCharts/GetRateHistory',
+                type: 'GET',
+                data: { company: company, pair: pair, rate: rate },
+                success: function (data) {
+                    var color = getRandomColor();
+                    var newDataset = {
+                        label: company + " " + pair + " " + rate,
+                        data: data.rates.map(function (rate) {
+                            return parseFloat(rate).toFixed(2);
+                        }),
+                        fill: false,
+                        borderColor: color,
+                        tension: 0.1,
+                        hidden: false
+                    };
+                    chartData.labels = data.dates;
+                    chartData.datasets.push(newDataset);
+                    myChart.update();
+
+                    // Додаємо чекбокс для контролю видимості лінії
+                    $('.legend-container').append(
+                        '<div class="legend-item" style="color: ' + color + ';">' +
+                        '<input type="checkbox" class="lineCheckbox" checked data-index="' + (chartData.datasets.length - 1) + '">' +
+                        '<label>' + company + " " + pair + " " + rate + '</label>' +
+                        '<button class="removeLineButton" data-index="' + (chartData.datasets.length - 1) + '">Видалити</button>' +
+                        '</div>'
+                    );
+                }
+            });
+        }
+
+        // Функція для генерації випадкового кольору
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Обробник події для додавання нової лінії
+        $('#addLineButton').on('click', function () {
+            var company = $('#companySelect').val();
+            var pair = $('#pairSelect').val();
+            var rate = $('#rateSelect').val();
+            addLine(company, pair, rate);
+        });
+
+        // Обробник події для контролю видимості ліній
+        $(document).on('change', '.lineCheckbox', function () {
+            var index = $(this).data('index');
+            myChart.data.datasets[index].hidden = !this.checked;
+            myChart.update();
+        });
+
+        // Обробник події для видалення ліній
+        $(document).on('click', '.removeLineButton', function () {
+            var index = $(this).data('index');
+            myChart.data.datasets.splice(index, 1);
+            $(this).parent().remove(); // Видаляємо батьківський div, що містить чекбокс і кнопку
+            myChart.update();
+        });
+
+        // Обробник події для обчислення кореляції
+        $('#calculateCorrelationButton').on('click', function () {
+            var company1 = $('#companySelect1').val();
+            var pair1 = $('#pairSelect1').val();
+            var rate1 = $('#rateSelect1').val();
+            var company2 = $('#companySelect2').val();
+            var pair2 = $('#pairSelect2').val();
+            var rate2 = $('#rateSelect2').val();
+
+            $.ajax({
+                url: '/LineCharts/CalculateCorrelation',
+                type: 'GET',
+                data: {
+                    company1: company1,
+                    pair1: pair1,
+                    rate1: rate1,
+                    company2: company2,
+                    pair2: pair2,
+                    rate2: rate2
+                },
+                success: function (data) {
+                    $('#correlationResult').text('Кореляція між обраними параметрами: ' + (data.correlation * 100).toFixed(2) + '%');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

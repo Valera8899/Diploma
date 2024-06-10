@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center semi-transparent-background">
+    <h1 class="display-4">Вітаємо в Monitor!</h1>
+
+    <div class="search-form">
+        <form asp-action="Index" asp-controller="SearchResult" method="get" style="position: relative;">
+            <input type="text" name="searchQuery" class="form-control" placeholder="Введіть запит для пошуку" required id="search-input" autocomplete="off" />
+            <button type="submit" class="btn btn-primary ml-2">Шукати</button>
+            <div class="dropdown-menu" id="search-history-dropdown">
+                <!-- Тут будуть з'являтися останні пошуки -->
+            </div>
+        </form>
+    </div>
+
+    <div class="text-background">
+        <h5>Завдяки нашому сервісу Ви зможете:</h5>
+        <p style="text-align: left;">1. Шукати товари одразу в багатьох інтернет-магазинах та маркетплейсах.</p>
+        <p style="text-align: left;">2. Завжди мати доступ до всієї вашої історії пошуків із всіма встановленими параметрами.</p>
+        <p style="text-align: left;">3. Дуже швидко отримувати сповіщення про появу нових лотів, які відповідають параметрам збереженого пошуку.</p>
+        <p style="text-align: left;">4. Автоматично моніторити динаміку цін на певний товар протягом всього часу, коли товар є доступним на відповідному торговому майданчику.</p>
+        <p style="text-align: left;">5. Порівнювати динаміку цін кількох різних товарів на одному графіку.</p>
+        <p style="text-align: left;">6. Порівнювати динаміку цін різних товарів із ринковим курсом різних іноземних валют на графіку.</p>
+        <p style="text-align: left;">7. Порівнювати динаміку курсів купівлі та продажу цих валют в різних фінкомпаніях.</p>
+        <p style="text-align: left;">8. Кількісно визначати кореляцію між будь-якими динаміками цін або курсів, перелічених вище, аби помічати неочевидні взаємозалежності.</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#search-input').on('focus', function () {
+                $.get('/SearchResult/GetRecentSearches', function (data) {
+                    var dropdown = $('#search-history-dropdown');
+                    dropdown.empty();
+                    data.forEach(function (search) {
+                        dropdown.append('<a class="dropdown-item" href="/SearchResult/Index?searchQuery=' + search.searchQuery + '">' + search.searchQuery + '</a>');
+                    });
+                    dropdown.show();
+                });
+            });
+
+            $(document).click(function (e) {
+                if (!$(e.target).closest('#search-input, #search-history-dropdown').length) {
+                    $('#search-history-dropdown').hide();
+                }
+            });
+        });
+    </script>
+}
